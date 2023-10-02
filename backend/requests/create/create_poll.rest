@@ -1,0 +1,24 @@
+POST http://localhost:3001/api/polls
+Content-Type: application/json
+
+{
+    "title": "happy place",
+    "options":
+    [
+        {
+            "id": 1,
+            "answer": "home",
+            "likes": 32
+        },        
+        {
+            "id": 2,
+            "answer": "library",
+            "likes": 4
+        },
+        {
+            "id": 3,
+            "answer": "gym",
+            "likes": 16
+        }
+    ]
+}
