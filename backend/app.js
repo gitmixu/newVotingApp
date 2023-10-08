@@ -1,11 +1,16 @@
-const config = require('./utils/config')
+const config = require('./utils/config.js')
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const pollsRouter = require('./controllers/polls')
-const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
+require('express-async-errors')
+
+const pollRouter = require('./controllers/polls')
+const usersRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
+
+const middleware = require('./utils/middleware')
 
 mongoose.set('strictQuery', false)
 
@@ -24,7 +29,11 @@ app.use(express.static('dist'))
 app.use(express.json())
 app.use(middleware.requestLogger)
 
-app.use('/api/polls', pollsRouter)
+app.use(middleware.tokenExtractor)
+
+app.use('/api/polls', middleware.userExtractor, pollRouter)
+app.use('/api/login', loginRouter)
+app.use('/api/users', usersRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)

@@ -1,24 +1,25 @@
 POST http://localhost:3001/api/polls
 Content-Type: application/json
+Authorization: Bearer token
 
 {
-    "title": "happy place",
+    "title": "how are you",
     "options":
     [
         {
             "id": 1,
-            "answer": "home",
-            "likes": 32
+            "answer": "good",
+            "likes": 0
         },        
         {
             "id": 2,
-            "answer": "library",
-            "likes": 4
+            "answer": "fine",
+            "likes": 0
         },
         {
             "id": 3,
-            "answer": "gym",
-            "likes": 16
+            "answer": "not good",
+            "likes": 0
         }
     ]
 }

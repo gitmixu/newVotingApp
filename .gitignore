@@ -2,5 +2,6 @@
 
 backend/node_modules
 backend/.env
+backend/requests
 
 frontend/node_modules

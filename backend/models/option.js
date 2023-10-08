@@ -1,21 +1,14 @@
 const mongoose = require('mongoose')
 
-const pollSchema = new mongoose.Schema({
-  title: {
+const optionSchema = new mongoose.Schema({
+  answer: {
     type: String,
     required: true,
     minlength: 1
   },
-  options: {
-    type: Array
-  },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
 })
 
-pollSchema.set('toJSON', {
+optionSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
@@ -23,4 +16,4 @@ pollSchema.set('toJSON', {
   }
 })
 
-module.exports = mongoose.model('Poll', pollSchema)
+module.exports = mongoose.model('Option', optionSchema)
