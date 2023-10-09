@@ -1,10 +1,21 @@
 const pollRouter = require('express').Router()
 const Poll = require('../models/poll')
+const User = require('../models/user')
+
+const jwt = require('jsonwebtoken')
+
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+  return null
+}
 
 // ALL
 pollRouter.get('/', async (req, res) => {
   const polls = await Poll
-    .find({}).populate('user', { username: 1, name: 1 })
+    .find({}).populate('user', { name: 1, username: 1 })
 
   res.json(polls)
 })
@@ -23,55 +34,30 @@ pollRouter.get('/:id', async (req, res) => {
 pollRouter.post('/', async (req, res) => {
   const body = req.body
 
-  if (!body.title) {
-    return res.status(400).json({ error: 'Title is Missing' })
+  const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+  if (!decodedToken.id) {
+    return res.status(401).json({ error: 'token invalid' })
   }
 
-  const user = req.user
+  const user = await User.findById(decodedToken.id)
 
   const poll = new Poll({
     title: body.title,
     options: body.options,
-    user: user._id,
+    user: user._id
   })
 
   const savedPoll = await poll.save()
   user.polls = user.polls.concat(savedPoll._id)
   await user.save()
 
-  res.status(201).json(savedPoll)
+  res.json(savedPoll)
 })
 
 // DEL
 pollRouter.delete('/:id', async (req, res) => {
-  const id = req.params.id
-  const user = req.user
-  const poll = await Poll.findById(id)
-
-  if (!poll) {
-    return res
-      .status(400)
-      .json({ error: `Poll by ID ${id} does not exist` })
-  }
-
-  if (!poll.user) {
-    return res
-      .status(404)
-      .json({ error: `Poll by ID ${id} does not have owner user` })
-  }
-
-  if (poll.user.toString() === user._id.toString()) {
-    await Poll.findByIdAndDelete(id)
-    user.polls = user.polls.filter(
-      pollID => pollID.toString() !== poll._id.toString()
-    )
-    await user.save()
-    res.status(204).end()
-  } else {
-    return res
-      .status(401)
-      .json({ error: 'Unauthorized access to the poll' })
-  }
+  await Poll.findByIdAndRemove(req.params.id)
+  res.status(204).end()
 })
 
 // UPDATE
