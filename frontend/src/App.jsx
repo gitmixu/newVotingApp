@@ -7,7 +7,6 @@ import Togglable from './components/Togglable'
 import PollForm from './components/PollForm'
 import userService from './services/user'
 import pollService from './services/polls'
-import optionService from './services/options'
 
 const App = () => {
   const [user, setUser] = useState(null)
@@ -15,8 +14,9 @@ const App = () => {
   const [signUpVisible, setSignUpVisible] = useState(false)
 
   const [title, setTitle] = useState('')
-  const [answer, setAnswer] = useState('')
-  const [options, setOptions] = useState([])
+  const [opt1, setOpt1] = useState('')
+  const [opt2, setOpt2] = useState('')
+  const [opt3, setOpt3] = useState('')
 
   const [errorMessage, setErrorMessage] = useState(null)
   const [name, setName] = useState('')
@@ -145,19 +145,61 @@ const App = () => {
     }
 
     const handleVote = (poll, option) => {
+      if(user) {
+        const findPoll = polls.find(p => p.id === poll.id)
+        const changedPoll = { ...findPoll }
+        console.log(poll)
+        console.log(changedPoll.options[option.id-1].likes)
+        changedPoll.options[option.id-1].likes += 1
+  
+        pollService
+        .update(poll.id, changedPoll)
+        .then(returnedPoll => {
+          setPolls(polls.map(p => p.id !== poll.id ? p : returnedPoll))
+        })
+        .catch(error => {
+          setErrorMessage(
+            `Poll '${poll.title}' was already removed from server`
+          )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        })
+      }
+      if(!user){
+        setErrorMessage(
+          `you must be logged in`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+        return;
+      }
+
     }
 
     const addPoll = (e) => {
       e.preventDefault();
-      options.push(answer)
-
-      options.reduce((o, option) => {
-        return optionService.create(option)
-      })
       
       const pollObject = {
         title: title,
-        options,
+        options: [
+          {
+            id: 1,
+            option: opt1,
+            likes: 0
+          },
+          {
+            id: 2,
+            option: opt2,
+            likes: 0
+          },
+          {
+            id: 3,
+            option: opt3,
+            likes: 0
+          }
+        ]
       }
 
       pollService
@@ -167,32 +209,18 @@ const App = () => {
         })
     }
 
-    const addAnswer = (e) => {
-      e.preventDefault()
-      if (!answer){return}
-      let divElement = document.createElement('div')
-      divElement.classList.add('form-options')
-      let pElement = document.createElement('p')
-      let pT = document.createTextNode(answer)
-      pElement.appendChild(pT)
-      let bElement = document.createElement('button')
-      let bT = document.createTextNode('del')
-      bElement.appendChild(bT)
-      divElement.appendChild(pElement)
-      divElement.appendChild(bElement)
-      document.getElementById('answers').appendChild(divElement)
-      setAnswer('')
-    }
-
     const pollForm = () => (
       <Togglable buttonLabel="new poll">
         <PollForm
           onSubmit={addPoll}
           handleTitleChange={({ target }) => setTitle(target.value)}
           title={title}
-          handleAnswerChange={({ target }) => setAnswer(target.value)}
-          answer={answer}
-          addAnswer={addAnswer}
+          handleOpt1Change={({ target }) => setOpt1(target.value)}
+          opt1={opt1}
+          handleOpt2Change={({ target }) => setOpt2(target.value)}
+          opt2={opt2}
+          handleOpt3Change={({ target }) => setOpt3(target.value)}
+          opt3={opt3}
         />
       </Togglable>
       )
@@ -217,7 +245,24 @@ const App = () => {
       <h3>Polls</h3>
       <div className='polls'>
         {polls.map(poll => 
-          <Poll key={poll.id} poll={poll} />
+        <div key={poll.id} className="poll">
+          <p>{poll.title}</p>
+          <ul>
+            {poll.options.map(option => 
+              <li key={option.id}>
+                <div className="answer">
+                  <span>{option.id}.</span>
+                  <p>{option.option}</p>
+                </div>
+                <div className="likes">
+                  <p>{option.likes}</p>
+                  <button
+                    onClick={() => {handleVote(poll, option)}}>vote</button>
+                </div>
+              </li>
+            )}
+          </ul>
+        </div>
         )}
       </div>
     </div>
