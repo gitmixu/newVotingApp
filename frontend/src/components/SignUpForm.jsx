@@ -9,7 +9,7 @@ const SignUpForm = ({
     }) => {
    return (
      <div className="box">
-       <h2>Sign Up</h2>
+       <h2>sign up</h2>
   
        <form onSubmit={handleSubmit}>
         <div>

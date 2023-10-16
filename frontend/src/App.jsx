@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import Notification from './components/Notification'
-import Poll from './components/Poll'
 import LoginForm from './components/LoginForm'
 import SignUpForm from './components/SignUpForm'
 import Togglable from './components/Togglable'
@@ -47,7 +46,7 @@ const App = () => {
           <button onClick={() => {
               window.localStorage.removeItem('loggedVotingAppUser', JSON.stringify(user))
               setUser(null)
-          }}>log-out</button>
+          }}>log out</button>
       </div>
     )
 
@@ -147,9 +146,7 @@ const App = () => {
     const handleVote = (poll, option) => {
       if(user) {
         const findPoll = polls.find(p => p.id === poll.id)
-        const changedPoll = { ...findPoll }
-        console.log(poll)
-        console.log(changedPoll.options[option.id-1].likes)
+        const changedPoll = { title: findPoll.title, options: findPoll.options }
         changedPoll.options[option.id-1].likes += 1
   
         pollService
@@ -158,14 +155,16 @@ const App = () => {
           setPolls(polls.map(p => p.id !== poll.id ? p : returnedPoll))
         })
         .catch(error => {
+          console.log('error',error)
           setErrorMessage(
-            `Poll '${poll.title}' was already removed from server`
+            `${error.name}`
           )
           setTimeout(() => {
             setErrorMessage(null)
           }, 5000)
         })
       }
+
       if(!user){
         setErrorMessage(
           `you must be logged in`

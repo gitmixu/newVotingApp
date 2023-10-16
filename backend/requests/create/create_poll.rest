@@ -1,24 +1,24 @@
 POST http://localhost:3001/api/polls
 Content-Type: application/json
-Authorization: Bearer token
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1peHUiLCJpZCI6IjY1MWM2ODhjM2EyOWEwNDZhNGNhMDMxNCIsImlhdCI6MTY5NzQ3NzYxMiwiZXhwIjoxNjk3NDgxMjEyfQ.fCmfoyfmSSPnCjudEXcybBDLRMVxITcLXLIguH7OIVU
 
 {
-    "title": "how are you",
+    "title": "favorite color",
     "options":
     [
         {
             "id": 1,
-            "answer": "good",
+            "option": "black",
             "likes": 0
         },        
         {
             "id": 2,
-            "answer": "fine",
+            "option": "blue",
             "likes": 0
         },
         {
             "id": 3,
-            "answer": "not good",
+            "option": "red",
             "likes": 0
         }
     ]

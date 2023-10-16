@@ -62,16 +62,17 @@ pollRouter.delete('/:id', async (req, res) => {
 
 // UPDATE
 pollRouter.put('/:id', async (req, res, next) => {
-  const body = request.body
+  console.log('backend',req, res)
+  const body = req.body
 
   const poll = {
     title: body.title,
     options: body.options,
   }
 
-  Poll.findByIdAndUpdate(request.params.id, poll, { new: true })
+  Poll.findByIdAndUpdate(req.params.id, poll, { new: true })
     .then(updatedPoll => {
-      response.json(updatedPoll)
+      res.json(updatedPoll)
     })
     .catch(error => next(error))
 })
